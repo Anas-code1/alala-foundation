@@ -79,6 +79,7 @@ const CAUSE_IMPACT_MAP = {
 
 document.addEventListener('DOMContentLoaded', () => {
   initHeroCarousel();
+  initSpotlightCarousel();
   initStickyDomainCards();
   initCurrencySelector();
   initDonationWidget();
@@ -653,4 +654,45 @@ function initStickyDomainCards() {
   });
 
   domainBlocks.forEach(block => observer.observe(block));
+}
+
+
+// ============================================================================
+// Horizontal Spotlight Fieldwork Carousel
+// ============================================================================
+function initSpotlightCarousel() {
+  const track = document.getElementById('spotlight-track');
+  const prevBtn = document.getElementById('spotlight-prev');
+  const nextBtn = document.getElementById('spotlight-next');
+
+  if (!track || !prevBtn || !nextBtn) return;
+
+  function getScrollStep() {
+    const card = track.querySelector('.project-item');
+    if (!card) return 340;
+    const style = window.getComputedStyle(track);
+    const gap = parseFloat(style.gap) || 28;
+    return card.offsetWidth + gap;
+  }
+
+  prevBtn.addEventListener('click', () => {
+    track.scrollBy({ left: -getScrollStep(), behavior: 'smooth' });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    track.scrollBy({ left: getScrollStep(), behavior: 'smooth' });
+  });
+
+  function updateArrows() {
+    const atStart = track.scrollLeft <= 10;
+    const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
+    prevBtn.style.opacity = atStart ? '0.45' : '1';
+    prevBtn.style.pointerEvents = atStart ? 'none' : 'auto';
+    nextBtn.style.opacity = atEnd ? '0.45' : '1';
+    nextBtn.style.pointerEvents = atEnd ? 'none' : 'auto';
+  }
+
+  track.addEventListener('scroll', updateArrows, { passive: true });
+  window.addEventListener('resize', updateArrows);
+  updateArrows();
 }
